@@ -137,6 +137,8 @@ class ScanResult:
     ip: str
     port: int
     resolved_ip: str = ""
+    resolved_ips: str = ""
+    dns_match: str = ""  # match | mismatch | unresolved | skipped
     port_open: bool = False
     tls: bool = False
     starttls: bool = False
@@ -176,6 +178,27 @@ def resolve_host(hostname: str, fallback_ip: str) -> str:
     if fallback:
         logger.debug("Using fallback IP %s for %s", fallback, host or "<no-host>")
     return fallback
+
+
+def resolve_all_ips(hostname: str) -> list[str]:
+    """Return every IP address a hostname resolves to (IPv4 + IPv6)."""
+    host = (hostname or "").strip()
+    if not host:
+        return []
+    try:
+        info = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+        # Preserve order while de-duplicating.
+        seen: set[str] = set()
+        addrs: list[str] = []
+        for entry in info:
+            addr = entry[4][0]
+            if addr not in seen:
+                seen.add(addr)
+                addrs.append(addr)
+        return addrs
+    except Exception as exc:
+        logger.debug("DNS resolution failed for %s: %s", host, exc)
+        return []
 
 
 def check_port_open(ip: str, port: int, timeout: float = DEFAULT_TIMEOUT) -> bool:
@@ -393,6 +416,31 @@ def scan_target(result: ScanResult) -> ScanResult:
     """Scan a single target: DNS -> port -> TLS/STARTTLS -> certificate."""
     try:
         logger.info("Scanning %s (%s):%s", result.hostname, result.ip, result.port)
+
+        host = (result.hostname or "").strip()
+        provided_ip = (result.ip or "").strip()
+        dns_ips = resolve_all_ips(host) if host else []
+        result.resolved_ips = ", ".join(dns_ips)
+
+        # Verify hostname/IP agreement only when BOTH were provided.
+        if host and provided_ip:
+            if not dns_ips:
+                result.dns_match = "unresolved"
+                logger.warning("DNS check: %s did not resolve; cannot verify "
+                               "against provided IP %s", host, provided_ip)
+            elif provided_ip in dns_ips:
+                result.dns_match = "match"
+                logger.info("DNS check OK: %s resolves to provided IP %s",
+                            host, provided_ip)
+            else:
+                result.dns_match = "mismatch"
+                note = (f"DNS mismatch: {host} resolves to "
+                        f"{', '.join(dns_ips)}, not provided IP {provided_ip}")
+                logger.warning(note)
+                result.error = (result.error + " | " + note) if result.error else note
+        else:
+            result.dns_match = "skipped"
+
         result.resolved_ip = resolve_host(result.hostname, result.ip)
         if not result.resolved_ip:
             result.status = "no address"
@@ -446,7 +494,8 @@ def scan_target(result: ScanResult) -> ScanResult:
 # Reporting
 # --------------------------------------------------------------------------- #
 CSV_FIELDS = [
-    "hostname", "ip", "resolved_ip", "port", "port_open", "tls", "starttls",
+    "hostname", "ip", "resolved_ip", "resolved_ips", "dns_match",
+    "port", "port_open", "tls", "starttls",
     "starttls_available", "tls_version", "cipher", "cert_subject", "cert_issuer",
     "cert_serial", "cert_not_before", "cert_not_after", "cert_days_remaining",
     "cert_sans", "cert_sig_algo", "cert_fingerprint_sha256", "cert_self_signed",
