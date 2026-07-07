@@ -96,6 +96,38 @@ IMPLICIT_TLS_PORTS = {443, 465, 636, 993, 995, 990, 8443, 9443, 563, 6697}
 DEFAULT_TIMEOUT = 6.0
 
 
+def parse_port_list(text: str) -> list[int]:
+    """Parse a comma/space separated list of ports and ranges.
+
+    Accepts values like "80,443,8000-8010" or "22 80 443". Ranges use a
+    hyphen. Returns a de-duplicated, order-preserving list of valid ports.
+    Raises ValueError on malformed input or out-of-range ports.
+    """
+    ports: list[int] = []
+    cleaned = text.replace(";", ",").replace(" ", ",")
+    for part in cleaned.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            lo_s, hi_s = part.split("-", 1)
+            lo, hi = int(lo_s), int(hi_s)
+            if lo > hi:
+                lo, hi = hi, lo
+            ports.extend(range(lo, hi + 1))
+        else:
+            ports.append(int(part))
+    seen: set[int] = set()
+    out: list[int] = []
+    for p in ports:
+        if not (1 <= p <= 65535):
+            raise ValueError(f"Port out of range (1-65535): {p}")
+        if p not in seen:
+            seen.add(p)
+            out.append(p)
+    return out
+
+
 # --------------------------------------------------------------------------- #
 # Data model
 # --------------------------------------------------------------------------- #
@@ -596,6 +628,8 @@ class OracleInatorApp:
 
         self.targets: list[dict] = []
         self.results: list[ScanResult] = []
+        self.jobs: list[dict] = []
+        self.result_item_ids: list[str] = []
         self.source_label = "manual entry"
         self.event_queue: "queue.Queue" = queue.Queue()
         self.scanning = False
@@ -624,6 +658,17 @@ class OracleInatorApp:
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=10)
 
+        self.use_port_list_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(toolbar, text="Use port list", variable=self.use_port_list_var,
+                        command=self._on_port_list_toggle).pack(side=tk.LEFT)
+        ttk.Label(toolbar, text="Ports:").pack(side=tk.LEFT, padx=(6, 2))
+        self.ports_var = tk.StringVar(value="443,8443")
+        self.ports_entry = ttk.Entry(toolbar, textvariable=self.ports_var, width=22)
+        self.ports_entry.pack(side=tk.LEFT, padx=(0, 10))
+        self.ports_entry.configure(state=tk.DISABLED)
+
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=10)
+
         self.threads_var = tk.IntVar(value=20)
         ttk.Label(toolbar, text="Threads:").pack(side=tk.LEFT)
         ttk.Spinbox(toolbar, from_=1, to=200, width=5,
@@ -637,16 +682,37 @@ class OracleInatorApp:
         self.status_var = tk.StringVar(value="Idle")
         ttk.Label(toolbar, textvariable=self.status_var).pack(side=tk.RIGHT, padx=6)
 
-        # Split pane: results table on top, debug log on bottom.
+        # Vertical split: (targets | results) on top, debug log on bottom.
         paned = ttk.PanedWindow(self.root, orient=tk.VERTICAL)
         paned.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
 
-        table_frame = ttk.Frame(paned)
-        paned.add(table_frame, weight=3)
+        lists = ttk.PanedWindow(paned, orient=tk.HORIZONTAL)
+        paned.add(lists, weight=3)
 
+        # -- Targets list (hosts to be scanned) --
+        target_frame = ttk.LabelFrame(lists, text="Targets (hosts to scan)")
+        lists.add(target_frame, weight=1)
+        tcols = ("hostname", "ip", "port")
+        self.target_tree = ttk.Treeview(target_frame, columns=tcols, show="headings")
+        theadings = {
+            "hostname": ("Hostname", 160), "ip": ("IP", 120), "port": ("Port", 60),
+        }
+        for c in tcols:
+            text, width = theadings[c]
+            self.target_tree.heading(c, text=text)
+            self.target_tree.column(c, width=width, anchor=tk.W)
+        tvsb = ttk.Scrollbar(target_frame, orient=tk.VERTICAL,
+                             command=self.target_tree.yview)
+        self.target_tree.configure(yscrollcommand=tvsb.set)
+        self.target_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        tvsb.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # -- Results list (all scan results) --
+        result_frame = ttk.LabelFrame(lists, text="Results")
+        lists.add(result_frame, weight=3)
         cols = ("hostname", "ip", "port", "status", "tls", "version",
                 "cipher", "subject", "expires")
-        self.tree = ttk.Treeview(table_frame, columns=cols, show="headings")
+        self.tree = ttk.Treeview(result_frame, columns=cols, show="headings")
         headings = {
             "hostname": ("Hostname", 150), "ip": ("IP", 120), "port": ("Port", 60),
             "status": ("Status", 150), "tls": ("TLS", 60), "version": ("Version", 90),
@@ -657,7 +723,7 @@ class OracleInatorApp:
             text, width = headings[c]
             self.tree.heading(c, text=text)
             self.tree.column(c, width=width, anchor=tk.W)
-        vsb = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.tree.yview)
+        vsb = ttk.Scrollbar(result_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=vsb.set)
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         vsb.pack(side=tk.RIGHT, fill=tk.Y)
@@ -682,6 +748,10 @@ class OracleInatorApp:
         handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s",
                                                datefmt="%H:%M:%S"))
         logger.addHandler(handler)
+
+    def _on_port_list_toggle(self) -> None:
+        state = tk.NORMAL if self.use_port_list_var.get() else tk.DISABLED
+        self.ports_entry.configure(state=state)
 
     # -- Target management ------------------------------------------------- #
     def load_csv(self) -> None:
@@ -785,19 +855,18 @@ class OracleInatorApp:
 
     def _add_target_row(self, target: dict) -> None:
         self.targets.append(target)
-        self.tree.insert(
+        self.target_tree.insert(
             "", tk.END,
-            values=(target["hostname"], target["ip"], target["port"],
-                    "pending", "", "", "", "", ""),
+            values=(target["hostname"], target["ip"], target["port"]),
         )
 
     def remove_selected(self) -> None:
         if self.scanning:
             return
-        selected = self.tree.selection()
+        selected = self.target_tree.selection()
         for item in selected:
-            index = self.tree.index(item)
-            self.tree.delete(item)
+            index = self.target_tree.index(item)
+            self.target_tree.delete(item)
             if 0 <= index < len(self.targets):
                 self.targets.pop(index)
 
@@ -806,48 +875,87 @@ class OracleInatorApp:
             return
         self.targets.clear()
         self.results.clear()
+        for item in self.target_tree.get_children():
+            self.target_tree.delete(item)
         for item in self.tree.get_children():
             self.tree.delete(item)
         self.status_var.set("Idle")
         self.progress["value"] = 0
 
     # -- Scanning ---------------------------------------------------------- #
+    def _build_jobs(self) -> Optional[list[dict]]:
+        """Expand targets into (host, port) jobs, honouring the port list."""
+        port_list: list[int] = []
+        if self.use_port_list_var.get():
+            try:
+                port_list = parse_port_list(self.ports_var.get())
+            except ValueError as exc:
+                messagebox.showerror("Port List", f"Invalid port list:\n{exc}")
+                return None
+            if not port_list:
+                messagebox.showwarning("Port List",
+                                       "Enter at least one port to scan.")
+                return None
+
+        jobs: list[dict] = []
+        for t in self.targets:
+            ports = port_list if port_list else [int(t["port"])]
+            for p in ports:
+                jobs.append({"hostname": t["hostname"], "ip": t["ip"], "port": p})
+        return jobs
+
     def start_scan(self) -> None:
         if self.scanning:
             return
         if not self.targets:
             messagebox.showinfo("Start Scan", "Load a CSV or add a target first.")
             return
+
+        jobs = self._build_jobs()
+        if jobs is None:
+            return
+        if not jobs:
+            messagebox.showinfo("Start Scan", "Nothing to scan.")
+            return
+
         self.scanning = True
         self.completed = 0
         self.results = []
+        self.jobs = jobs
         self._set_buttons_state(tk.DISABLED)
         self.progress["value"] = 0
-        self.progress["maximum"] = len(self.targets)
-        self.status_var.set(f"Scanning 0/{len(self.targets)}")
+        self.progress["maximum"] = len(jobs)
+        self.status_var.set(f"Scanning 0/{len(jobs)}")
 
-        # Refresh table rows to a clean pending state.
+        # Rebuild the results list with one pending row per job.
         for item in self.tree.get_children():
-            vals = list(self.tree.item(item, "values"))
-            vals[3] = "pending"
-            self.tree.item(item, values=vals, tags=())
+            self.tree.delete(item)
+        self.result_item_ids = []
+        for job in jobs:
+            item_id = self.tree.insert(
+                "", tk.END,
+                values=(job["hostname"], job["ip"], job["port"],
+                        "pending", "", "", "", "", ""),
+            )
+            self.result_item_ids.append(item_id)
 
         worker = threading.Thread(target=self._run_scan, name="scan-orchestrator",
                                   daemon=True)
         worker.start()
 
     def _run_scan(self) -> None:
-        items = list(self.tree.get_children())
-        max_workers = max(1, min(self.threads_var.get(), len(self.targets)))
-        logger.info("Starting scan of %d target(s) with %d worker(s)",
-                    len(self.targets), max_workers)
+        jobs = self.jobs
+        item_ids = self.result_item_ids
+        max_workers = max(1, min(self.threads_var.get(), len(jobs)))
+        logger.info("Starting scan of %d job(s) across %d host(s) with %d worker(s)",
+                    len(jobs), len(self.targets), max_workers)
         try:
             with ThreadPoolExecutor(max_workers=max_workers,
                                     thread_name_prefix="scan") as pool:
                 future_map = {}
-                for item_id, target in zip(items, self.targets):
-                    res = ScanResult(hostname=target["hostname"],
-                                     ip=target["ip"], port=int(target["port"]))
+                for item_id, job in zip(item_ids, jobs):
+                    res = ScanResult(hostname=job["hostname"],
+                                     ip=job["ip"], port=int(job["port"]))
                     future_map[pool.submit(scan_target, res)] = item_id
 
                 for future in as_completed(future_map):
@@ -906,12 +1014,12 @@ class OracleInatorApp:
         )
         self.completed += 1
         self.progress["value"] = self.completed
-        self.status_var.set(f"Scanning {self.completed}/{len(self.targets)}")
+        self.status_var.set(f"Scanning {self.completed}/{len(self.jobs)}")
 
     def _finish_scan(self) -> None:
         self.scanning = False
         self._set_buttons_state(tk.NORMAL)
-        self.status_var.set(f"Scan complete: {len(self.results)} target(s)")
+        self.status_var.set(f"Scan complete: {len(self.results)} result(s)")
         logger.info("Scan complete. Writing reports...")
         slug = timestamp_slug()
         csv_path = os.path.abspath(f"scan_{slug}.csv")

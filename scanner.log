@@ -26,3 +26,128 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-07-07 07:17:49 [WARNING ] MainThread: Could not resolve hostname and no IP provided
 2026-07-07 07:17:49 [INFO    ] MainThread: CSV report written: test_scan.csv
 2026-07-07 07:17:49 [INFO    ] MainThread: HTML report written: test_scan.html
+2026-07-07 07:18:52 [INFO    ] MainThread: oracle-inator starting up
+2026-07-07 07:19:05 [INFO    ] MainThread: Loaded 7 target(s) from C:/NetworkPortAndCertCheck/sample_targets.csv
+2026-07-07 07:19:15 [INFO    ] scan-orchestrator: Starting scan of 7 target(s) with 7 worker(s)
+2026-07-07 07:19:15 [INFO    ] scan_0: Scanning example.com ():443
+2026-07-07 07:19:15 [INFO    ] scan_1: Scanning badssl.com ():443
+2026-07-07 07:19:15 [INFO    ] scan_2: Scanning expired.badssl.com ():443
+2026-07-07 07:19:15 [INFO    ] scan_3: Scanning self-signed.badssl.com ():443
+2026-07-07 07:19:15 [INFO    ] scan_4: Scanning smtp.gmail.com ():587
+2026-07-07 07:19:15 [INFO    ] scan_5: Scanning imap.gmail.com ():143
+2026-07-07 07:19:15 [INFO    ] scan_6: Scanning google.com ():80
+2026-07-07 07:19:15 [DEBUG   ] scan_0: DNS resolved example.com -> 104.20.23.154
+2026-07-07 07:19:15 [DEBUG   ] scan_6: DNS resolved google.com -> 142.251.45.14
+2026-07-07 07:19:15 [DEBUG   ] scan_5: DNS resolved imap.gmail.com -> 142.250.101.109
+2026-07-07 07:19:15 [DEBUG   ] scan_4: DNS resolved smtp.gmail.com -> 142.251.2.108
+2026-07-07 07:19:15 [DEBUG   ] scan_3: DNS resolved self-signed.badssl.com -> 104.154.89.105
+2026-07-07 07:19:15 [INFO    ] scan_0: TLS OK 104.20.23.154:443 proto=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)
+2026-07-07 07:19:15 [DEBUG   ] scan_2: DNS resolved expired.badssl.com -> 104.154.89.105
+2026-07-07 07:19:15 [DEBUG   ] scan_1: DNS resolved badssl.com -> 104.154.89.105
+2026-07-07 07:19:15 [DEBUG   ] scan_6: TLS handshake failed 142.251.45.14:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 07:19:16 [INFO    ] scan_4: TLS OK 142.251.2.108:587 proto=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)
+2026-07-07 07:19:17 [INFO    ] scan_1: TLS OK 104.154.89.105:443 proto=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 (128-bit, TLSv1.2)
+2026-07-07 07:19:21 [DEBUG   ] scan_5: Port closed/unreachable 142.250.101.109:143 (timed out)
+2026-07-07 07:19:21 [DEBUG   ] scan_3: Port closed/unreachable 104.154.89.105:443 (timed out)
+2026-07-07 07:19:21 [ERROR   ] scan_2: Unexpected error during TLS on 104.154.89.105:443
+Traceback (most recent call last):
+  File "C:\NetworkPortAndCertCheck\oracle-inator.py", line 379, in scan_target
+    perform_tls(result)
+  File "C:\NetworkPortAndCertCheck\oracle-inator.py", line 258, in perform_tls
+    raw_sock = socket.create_connection((ip, port), timeout=DEFAULT_TIMEOUT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\socket.py", line 852, in create_connection
+    raise exceptions[0]
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\socket.py", line 837, in create_connection
+    sock.connect(sa)
+TimeoutError: timed out
+2026-07-07 07:19:21 [INFO    ] MainThread: Scan complete. Writing reports...
+2026-07-07 07:19:21 [INFO    ] MainThread: CSV report written: C:\NetworkPortAndCertCheck\scan_070726_0719.csv
+2026-07-07 07:19:21 [INFO    ] MainThread: HTML report written: C:\NetworkPortAndCertCheck\scan_070726_0719.html
+2026-07-07 10:06:23 [INFO    ] MainThread: oracle-inator starting up
+2026-07-07 10:14:05 [INFO    ] MainThread: oracle-inator shutting down
+2026-07-07 10:14:06 [INFO    ] MainThread: oracle-inator shutting down
+2026-07-07 10:14:15 [INFO    ] MainThread: oracle-inator starting up
+2026-07-07 10:14:20 [INFO    ] MainThread: Loaded 7 target(s) from C:/NetworkPortAndCertCheck/sample_targets.csv
+2026-07-07 10:14:39 [INFO    ] scan-orchestrator: Starting scan of 21 job(s) across 7 host(s) with 20 worker(s)
+2026-07-07 10:14:39 [INFO    ] scan_0: Scanning example.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_1: Scanning example.com ():8443
+2026-07-07 10:14:39 [INFO    ] scan_2: Scanning example.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_3: Scanning badssl.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_4: Scanning badssl.com ():8443
+2026-07-07 10:14:39 [INFO    ] scan_5: Scanning badssl.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_6: Scanning expired.badssl.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_7: Scanning expired.badssl.com ():8443
+2026-07-07 10:14:39 [INFO    ] scan_8: Scanning expired.badssl.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_9: Scanning self-signed.badssl.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_10: Scanning self-signed.badssl.com ():8443
+2026-07-07 10:14:39 [INFO    ] scan_11: Scanning self-signed.badssl.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_12: Scanning smtp.gmail.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_13: Scanning smtp.gmail.com ():8443
+2026-07-07 10:14:39 [INFO    ] scan_14: Scanning smtp.gmail.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_15: Scanning imap.gmail.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_16: Scanning imap.gmail.com ():8443
+2026-07-07 10:14:39 [INFO    ] scan_17: Scanning imap.gmail.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_18: Scanning google.com ():443
+2026-07-07 10:14:39 [INFO    ] scan_19: Scanning google.com ():8443
+2026-07-07 10:14:39 [DEBUG   ] scan_18: DNS resolved google.com -> 142.251.32.174
+2026-07-07 10:14:39 [DEBUG   ] scan_13: DNS resolved smtp.gmail.com -> 142.251.2.108
+2026-07-07 10:14:39 [DEBUG   ] scan_1: DNS resolved example.com -> 172.66.147.243
+2026-07-07 10:14:39 [DEBUG   ] scan_19: DNS resolved google.com -> 142.251.32.174
+2026-07-07 10:14:39 [DEBUG   ] scan_17: DNS resolved imap.gmail.com -> 142.250.101.108
+2026-07-07 10:14:39 [DEBUG   ] scan_15: DNS resolved imap.gmail.com -> 142.250.101.108
+2026-07-07 10:14:39 [DEBUG   ] scan_16: DNS resolved imap.gmail.com -> 142.250.101.108
+2026-07-07 10:14:39 [DEBUG   ] scan_12: DNS resolved smtp.gmail.com -> 142.251.2.108
+2026-07-07 10:14:39 [DEBUG   ] scan_2: DNS resolved example.com -> 172.66.147.243
+2026-07-07 10:14:39 [DEBUG   ] scan_0: DNS resolved example.com -> 172.66.147.243
+2026-07-07 10:14:39 [DEBUG   ] scan_14: DNS resolved smtp.gmail.com -> 142.251.2.108
+2026-07-07 10:14:39 [INFO    ] scan_0: TLS OK 172.66.147.243:443 proto=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)
+2026-07-07 10:14:39 [INFO    ] scan_0: Scanning google.com ():80
+2026-07-07 10:14:39 [INFO    ] scan_18: TLS OK 142.251.32.174:443 proto=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)
+2026-07-07 10:14:39 [DEBUG   ] scan_0: DNS resolved google.com -> 142.251.32.174
+2026-07-07 10:14:39 [DEBUG   ] scan_2: TLS handshake failed 172.66.147.243:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 10:14:39 [INFO    ] scan_1: TLS OK 172.66.147.243:8443 proto=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)
+2026-07-07 10:14:39 [DEBUG   ] scan_7: DNS resolved expired.badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_8: DNS resolved expired.badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_6: DNS resolved expired.badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_4: DNS resolved badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_5: DNS resolved badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_3: DNS resolved badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_10: DNS resolved self-signed.badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_11: DNS resolved self-signed.badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_9: DNS resolved self-signed.badssl.com -> 104.154.89.105
+2026-07-07 10:14:39 [DEBUG   ] scan_0: TLS handshake failed 142.251.32.174:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 10:14:39 [DEBUG   ] scan_8: TLS handshake failed 104.154.89.105:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 10:14:39 [DEBUG   ] scan_5: TLS handshake failed 104.154.89.105:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 10:14:39 [DEBUG   ] scan_11: TLS handshake failed 104.154.89.105:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 10:14:40 [INFO    ] scan_9: TLS OK 104.154.89.105:443 proto=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 (128-bit, TLSv1.2)
+2026-07-07 10:14:41 [ERROR   ] scan_3: Unexpected error during TLS on 104.154.89.105:443
+Traceback (most recent call last):
+  File "C:\NetworkPortAndCertCheck\oracle-inator.py", line 411, in scan_target
+    perform_tls(result)
+  File "C:\NetworkPortAndCertCheck\oracle-inator.py", line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py", line 1042, in _create
+    self.do_handshake()
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py", line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2026-07-07 10:14:45 [DEBUG   ] scan_17: Port closed/unreachable 142.250.101.108:80 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_12: Port closed/unreachable 142.251.2.108:443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_14: Port closed/unreachable 142.251.2.108:80 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_15: Port closed/unreachable 142.250.101.108:443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_19: Port closed/unreachable 142.251.32.174:8443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_13: Port closed/unreachable 142.251.2.108:8443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_16: Port closed/unreachable 142.250.101.108:8443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_6: Port closed/unreachable 104.154.89.105:443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_7: Port closed/unreachable 104.154.89.105:8443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_4: Port closed/unreachable 104.154.89.105:8443 (timed out)
+2026-07-07 10:14:45 [DEBUG   ] scan_10: Port closed/unreachable 104.154.89.105:8443 (timed out)
+2026-07-07 10:14:45 [INFO    ] MainThread: Scan complete. Writing reports...
+2026-07-07 10:14:45 [INFO    ] MainThread: CSV report written: C:\NetworkPortAndCertCheck\scan_070726_1014.csv
+2026-07-07 10:14:45 [INFO    ] MainThread: HTML report written: C:\NetworkPortAndCertCheck\scan_070726_1014.html
+2026-07-07 10:15:38 [INFO    ] MainThread: oracle-inator shutting down

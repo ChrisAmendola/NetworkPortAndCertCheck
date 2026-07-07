@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oracle-inator Scan Report</title>
+<style>
+  :root {
+    --bg:#0f172a; --card:#1e293b; --ink:#e2e8f0; --muted:#94a3b8;
+    --accent:#38bdf8; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --line:#334155;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  header { padding:28px 32px; background:linear-gradient(120deg,#0ea5e9,#6366f1);
+    color:#fff; }
+  header h1 { margin:0 0 4px; font-size:26px; letter-spacing:.5px; }
+  header p { margin:0; opacity:.9; font-size:13px; }
+  .wrap { padding:24px 32px 48px; }
+  .cards { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:16px 20px; min-width:150px; flex:1; }
+  .card .n { font-size:30px; font-weight:700; }
+  .card .l { color:var(--muted); font-size:12px; text-transform:uppercase;
+    letter-spacing:.6px; }
+  table { width:100%; border-collapse:collapse; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  th,td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line);
+    font-size:13px; vertical-align:top; }
+  th { background:#0b1220; color:var(--muted); text-transform:uppercase;
+    font-size:11px; letter-spacing:.6px; position:sticky; top:0; }
+  tr:hover td { background:rgba(56,189,248,.06); }
+  .badge { display:inline-block; padding:2px 8px; border-radius:999px;
+    font-size:11px; font-weight:600; }
+  .badge.ok { background:rgba(34,197,94,.15); color:#4ade80; }
+  .badge.warn { background:rgba(245,158,11,.15); color:#fbbf24; }
+  .badge.bad { background:rgba(239,68,68,.15); color:#f87171; }
+  .mono { font-family:"Consolas",monospace; }
+  .small { font-size:11px; word-break:break-all; }
+  pre { white-space:pre-wrap; font-size:11px; color:var(--muted); margin:6px 0 0; }
+  details summary { cursor:pointer; color:var(--accent); }
+  footer { color:var(--muted); font-size:12px; padding:0 32px 32px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Oracle-inator &mdash; Network &amp; TLS Scan Report</h1>
+    <p>Generated 2026-07-07 10:14:45 &nbsp;&bull;&nbsp; Source: sample_targets.csv</p>
+  </header>
+  <div class="wrap">
+    <div class="cards">
+      <div class="card"><div class="n">21</div><div class="l">Targets</div></div>
+      <div class="card"><div class="n">10</div><div class="l">Ports Open</div></div>
+      <div class="card"><div class="n">4</div><div class="l">TLS Services</div></div>
+      <div class="card"><div class="n">0</div><div class="l">STARTTLS Upgraded</div></div>
+      <div class="card"><div class="n">6</div><div class="l">Errors</div></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Hostname</th><th>IP</th><th>Port</th><th>Status</th>
+          <th>TLS Ver</th><th>Cipher</th><th>Subject</th><th>Issuer</th>
+          <th>Expires</th><th>SHA-256 Fingerprint</th><th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>example.com</td>
+          <td>172.66.147.243</td>
+          <td>443</td>
+          <td><span class="badge ok">TLS + cert</span></td>
+          <td>TLSv1.3</td>
+          <td class="mono">TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)</td>
+          <td>CN=example.com</td>
+          <td>CN=Cloudflare TLS Issuing ECC CA 3, O=SSL Corporation</td>
+          <td>2026-08-29 21:41:26 UTC<br><span class="badge ok">53 days</span></td>
+          <td class="mono small">BE:AB:14:CF:39:67:8F:DA:0E:F1:60:6E:ED:B8:18:C2:29:8B:A2:CC:7A:00:88:6E:7D:C2:D2:41:0F:24:CD:35</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>google.com</td>
+          <td>142.251.32.174</td>
+          <td>443</td>
+          <td><span class="badge ok">TLS + cert</span></td>
+          <td>TLSv1.3</td>
+          <td class="mono">TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)</td>
+          <td>CN=*.google.com</td>
+          <td>CN=WE2, O=Google Trust Services</td>
+          <td>2026-09-14 08:35:29 UTC<br><span class="badge ok">68 days</span></td>
+          <td class="mono small">FE:FC:B2:97:05:20:13:55:93:EF:58:21:3D:16:92:31:63:59:F2:9A:7B:7B:39:BC:BE:B2:51:EA:92:51:C7:66</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>example.com</td>
+          <td>172.66.147.243</td>
+          <td>80</td>
+          <td><span class="badge warn">port open (no TLS)</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td><details><summary>error</summary><pre>TLS error: [SSL] record layer failure (_ssl.c:1000)
+
+Traceback (most recent call last):
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 411, in scan_target
+    perform_tls(result)
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1042, in _create
+    self.do_handshake()
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLError: [SSL] record layer failure (_ssl.c:1000)
+</pre></details></td>
+        </tr>
+        <tr>
+          <td>example.com</td>
+          <td>172.66.147.243</td>
+          <td>8443</td>
+          <td><span class="badge ok">TLS + cert</span></td>
+          <td>TLSv1.3</td>
+          <td class="mono">TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)</td>
+          <td>CN=example.com</td>
+          <td>CN=Cloudflare TLS Issuing ECC CA 3, O=SSL Corporation</td>
+          <td>2026-08-29 21:41:26 UTC<br><span class="badge ok">53 days</span></td>
+          <td class="mono small">BE:AB:14:CF:39:67:8F:DA:0E:F1:60:6E:ED:B8:18:C2:29:8B:A2:CC:7A:00:88:6E:7D:C2:D2:41:0F:24:CD:35</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>google.com</td>
+          <td>142.251.32.174</td>
+          <td>80</td>
+          <td><span class="badge warn">port open (no TLS)</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td><details><summary>error</summary><pre>TLS error: [SSL] record layer failure (_ssl.c:1000)
+
+Traceback (most recent call last):
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 411, in scan_target
+    perform_tls(result)
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1042, in _create
+    self.do_handshake()
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLError: [SSL] record layer failure (_ssl.c:1000)
+</pre></details></td>
+        </tr>
+        <tr>
+          <td>expired.badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>80</td>
+          <td><span class="badge warn">port open (no TLS)</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td><details><summary>error</summary><pre>TLS error: [SSL] record layer failure (_ssl.c:1000)
+
+Traceback (most recent call last):
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 411, in scan_target
+    perform_tls(result)
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1042, in _create
+    self.do_handshake()
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLError: [SSL] record layer failure (_ssl.c:1000)
+</pre></details></td>
+        </tr>
+        <tr>
+          <td>badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>80</td>
+          <td><span class="badge warn">port open (no TLS)</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td><details><summary>error</summary><pre>TLS error: [SSL] record layer failure (_ssl.c:1000)
+
+Traceback (most recent call last):
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 411, in scan_target
+    perform_tls(result)
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1042, in _create
+    self.do_handshake()
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLError: [SSL] record layer failure (_ssl.c:1000)
+</pre></details></td>
+        </tr>
+        <tr>
+          <td>self-signed.badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>80</td>
+          <td><span class="badge warn">port open (no TLS)</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td><details><summary>error</summary><pre>TLS error: [SSL] record layer failure (_ssl.c:1000)
+
+Traceback (most recent call last):
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 411, in scan_target
+    perform_tls(result)
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1042, in _create
+    self.do_handshake()
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLError: [SSL] record layer failure (_ssl.c:1000)
+</pre></details></td>
+        </tr>
+        <tr>
+          <td>self-signed.badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>443</td>
+          <td><span class="badge ok">TLS + cert</span></td>
+          <td>TLSv1.2</td>
+          <td class="mono">ECDHE-RSA-AES128-GCM-SHA256 (128-bit, TLSv1.2)</td>
+          <td>CN=*.badssl.com, O=BadSSL</td>
+          <td>CN=*.badssl.com, O=BadSSL</td>
+          <td>2028-06-29 21:00:20 UTC<br><span class="badge ok">723 days</span></td>
+          <td class="mono small">43:CE:F9:67:6E:B9:8F:5C:A8:85:B2:7A:32:B7:E1:06:0F:F8:51:29:DC:6C:53:83:62:62:FA:2C:7B:63:9B:C1</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>443</td>
+          <td><span class="badge warn">port open (error)</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td><details><summary>error</summary><pre>ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+Traceback (most recent call last):
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 411, in scan_target
+    perform_tls(result)
+  File &quot;C:\NetworkPortAndCertCheck\oracle-inator.py&quot;, line 302, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1042, in _create
+    self.do_handshake()
+  File &quot;C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py&quot;, line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+</pre></details></td>
+        </tr>
+        <tr>
+          <td>imap.gmail.com</td>
+          <td>142.250.101.108</td>
+          <td>80</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>smtp.gmail.com</td>
+          <td>142.251.2.108</td>
+          <td>443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>smtp.gmail.com</td>
+          <td>142.251.2.108</td>
+          <td>80</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>imap.gmail.com</td>
+          <td>142.250.101.108</td>
+          <td>443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>google.com</td>
+          <td>142.251.32.174</td>
+          <td>8443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>smtp.gmail.com</td>
+          <td>142.251.2.108</td>
+          <td>8443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>imap.gmail.com</td>
+          <td>142.250.101.108</td>
+          <td>8443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>expired.badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>expired.badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>8443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>8443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>self-signed.badssl.com</td>
+          <td>104.154.89.105</td>
+          <td>8443</td>
+          <td><span class="badge bad">port closed</span></td>
+          <td>-</td>
+          <td class="mono">-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="mono small">-</td>
+          <td>-</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <footer>Report produced by oracle-inator.py</footer>
+</body>
+</html>
