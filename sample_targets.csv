@@ -1,0 +1,8 @@
+hostname,ip,port
+example.com,,443
+badssl.com,,443
+expired.badssl.com,,443
+self-signed.badssl.com,,443
+smtp.gmail.com,,587
+imap.gmail.com,,143
+google.com,,80

@@ -1,0 +1,28 @@
+2026-07-07 07:17:48 [INFO    ] MainThread: Scanning example.com ():443
+2026-07-07 07:17:48 [DEBUG   ] MainThread: DNS resolved example.com -> 104.20.23.154
+2026-07-07 07:17:48 [INFO    ] MainThread: TLS OK 104.20.23.154:443 proto=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 (256-bit, TLSv1.3)
+2026-07-07 07:17:48 [INFO    ] MainThread: Scanning self-signed.badssl.com ():443
+2026-07-07 07:17:48 [DEBUG   ] MainThread: DNS resolved self-signed.badssl.com -> 104.154.89.105
+2026-07-07 07:17:49 [ERROR   ] MainThread: Unexpected error during TLS on 104.154.89.105:443
+Traceback (most recent call last):
+  File "C:\NetworkPortAndCertCheck\oracle-inator.py", line 379, in scan_target
+    perform_tls(result)
+  File "C:\NetworkPortAndCertCheck\oracle-inator.py", line 270, in perform_tls
+    ssl_sock = ctx.wrap_socket(raw_sock, server_hostname=sni)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py", line 1042, in _create
+    self.do_handshake()
+  File "C:\Users\ChrisAmendola\anaconda3\Lib\ssl.py", line 1320, in do_handshake
+    self._sslobj.do_handshake()
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2026-07-07 07:17:49 [INFO    ] MainThread: Scanning google.com ():80
+2026-07-07 07:17:49 [DEBUG   ] MainThread: DNS resolved google.com -> 142.251.32.174
+2026-07-07 07:17:49 [DEBUG   ] MainThread: TLS handshake failed 142.251.32.174:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-07 07:17:49 [INFO    ] MainThread: Scanning nonexistent.invalid.tld ():443
+2026-07-07 07:17:49 [DEBUG   ] MainThread: DNS resolution failed for nonexistent.invalid.tld: [Errno 11001] getaddrinfo failed
+2026-07-07 07:17:49 [WARNING ] MainThread: Could not resolve hostname and no IP provided
+2026-07-07 07:17:49 [INFO    ] MainThread: CSV report written: test_scan.csv
+2026-07-07 07:17:49 [INFO    ] MainThread: HTML report written: test_scan.html
