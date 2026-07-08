@@ -46,6 +46,8 @@ from datetime import datetime, timezone
 from html import escape
 from typing import Optional
 
+import dbprobe
+
 try:
     from cryptography import x509
     from cryptography.hazmat.primitives import hashes
@@ -144,6 +146,10 @@ class ScanResult:
     resolved_ip: str = ""
     resolved_ips: str = ""
     dns_match: str = ""  # match | mismatch | unresolved | skipped
+    service: str = ""            # postgresql | mysql | mariadb | mssql | oracle-tns | oracle-tcps
+    service_version: str = ""
+    tls_mode: str = ""           # implicit | negotiated | required | none
+    notes: str = ""
     port_open: bool = False
     tls: bool = False
     starttls: bool = False
@@ -416,6 +422,32 @@ def _name_to_str(name) -> str:
     return ", ".join(parts)
 
 
+def _apply_probe_result(result: ScanResult, probe_res: "dbprobe.DBProbeResult") -> None:
+    """Fold a dbprobe fingerprint/TLS result into a ScanResult."""
+    result.service = probe_res.service
+    result.service_version = probe_res.service_version
+    result.tls_mode = probe_res.tls_mode
+    if probe_res.notes:
+        result.notes = probe_res.notes
+    if probe_res.tls:
+        result.tls = True
+        result.tls_version = probe_res.tls_version
+        result.cipher = probe_res.cipher
+        if probe_res.cert_der:
+            extract_certificate(probe_res.cert_der, result)
+        base = "TLS + cert" if result.cert_subject else "TLS (no cert)"
+        result.status = f"{probe_res.service}: {base}" if probe_res.service else base
+    elif probe_res.service:
+        suffix = {
+            "required": "TLS required (handshake failed)",
+            "negotiated": "TLS offered",
+            "supported": "TLS supported",
+        }.get(probe_res.tls_mode, "no TLS")
+        result.status = f"{probe_res.service}: {suffix}"
+    else:
+        result.status = "port open (no TLS)"
+
+
 def scan_target(result: ScanResult) -> ScanResult:
     """Scan a single target: DNS -> port -> TLS/STARTTLS -> certificate."""
     try:
@@ -455,6 +487,20 @@ def scan_target(result: ScanResult) -> ScanResult:
         result.port_open = check_port_open(result.resolved_ip, result.port)
         if not result.port_open:
             result.status = "port closed"
+            return result
+
+        # Database-aware fingerprint + protocol-specific TLS negotiation.
+        # Runs on every open port, so non-standard database ports are handled.
+        try:
+            probe_res = dbprobe.probe(result.resolved_ip, result.port,
+                                      result.hostname, DEFAULT_TIMEOUT, logger)
+        except Exception:
+            probe_res = None
+            result.traceback += traceback.format_exc()
+            logger.exception("Service probe crashed on %s:%s",
+                             result.resolved_ip, result.port)
+        if probe_res is not None:
+            _apply_probe_result(result, probe_res)
             return result
 
         proto = STARTTLS_PORTS.get(result.port)
@@ -499,6 +545,7 @@ def scan_target(result: ScanResult) -> ScanResult:
 # --------------------------------------------------------------------------- #
 CSV_FIELDS = [
     "hostname", "ip", "resolved_ip", "resolved_ips", "dns_match",
+    "service", "service_version", "tls_mode", "notes",
     "port", "port_open", "tls", "starttls",
     "starttls_available", "tls_version", "cipher", "cert_subject", "cert_issuer",
     "cert_serial", "cert_not_before", "cert_not_after", "cert_days_remaining",
@@ -564,11 +611,15 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
                 err += "\n\n" + escape(r.traceback)
             err += "</pre></details>"
 
+        svc = escape(r.service or '-')
+        if r.service and r.service_version:
+            svc = f'{escape(r.service)}<br><span class="small">{escape(r.service_version)}</span>'
         rows.append(f"""
         <tr>
           <td>{escape(r.hostname or '-')}</td>
           <td>{escape(r.resolved_ip or r.ip or '-')}</td>
           <td>{r.port}</td>
+          <td>{svc}</td>
           <td>{status_badge}</td>
           <td>{escape(r.tls_version or '-')}</td>
           <td class="mono">{escape(r.cipher or '-')}</td>
@@ -639,7 +690,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
     <table>
       <thead>
         <tr>
-          <th>Hostname</th><th>IP</th><th>Port</th><th>Status</th>
+          <th>Hostname</th><th>IP</th><th>Port</th><th>Service</th><th>Status</th>
           <th>TLS Ver</th><th>Cipher</th><th>Subject</th><th>Issuer</th>
           <th>Expires</th><th>SHA-256 Fingerprint</th><th>Error</th>
         </tr>
@@ -798,7 +849,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _fmt_result_line(idx: int, total: int, r: ScanResult) -> str:
     target = f"{r.hostname or r.ip}:{r.port}"
-    bits = [r.status]
+    bits = []
+    if r.service:
+        svc = r.service
+        if r.service_version:
+            svc += f" {r.service_version}"
+        bits.append(svc)
+    bits.append(r.status)
     if r.tls_version:
         bits.append(r.tls_version)
     if r.cert_days_remaining:
@@ -840,6 +897,10 @@ def print_summary(results: list[ScanResult]) -> None:
     starttls_ok = sum(1 for r in results if r.starttls)
     errors = sum(1 for r in results if r.error)
     mismatches = sum(1 for r in results if r.dns_match == "mismatch")
+    services: dict[str, int] = {}
+    for r in results:
+        if r.service:
+            services[r.service] = services.get(r.service, 0) + 1
     print("\n" + "=" * 52)
     print("  SCAN SUMMARY")
     print("=" * 52)
@@ -849,6 +910,9 @@ def print_summary(results: list[ScanResult]) -> None:
     print(f"  STARTTLS upgrade: {starttls_ok}")
     print(f"  DNS mismatches  : {mismatches}")
     print(f"  Errors          : {errors}")
+    if services:
+        print("  Services        : " + ", ".join(
+            f"{name} x{count}" for name, count in sorted(services.items())))
     print("=" * 52)
 
 

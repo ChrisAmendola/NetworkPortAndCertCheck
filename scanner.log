@@ -590,3 +590,24 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-07-08 06:58:52 [INFO    ] MainThread: CSV report written: C:\NetworkPortAndCertCheck\scan_080726_0658.csv
 2026-07-08 06:58:52 [INFO    ] MainThread: HTML report written: C:\NetworkPortAndCertCheck\scan_080726_0658.html
 2026-07-08 06:58:52 [INFO    ] MainThread: oracle-inator-cli finished
+2026-07-08 07:21:08 [INFO    ] MainThread: oracle-inator-cli starting up
+2026-07-08 15:15:09 [INFO    ] MainThread: oracle-inator-cli starting up
+2026-07-08 15:15:09 [INFO    ] MainThread: Starting scan of 4 job(s) with 4 worker(s)
+2026-07-08 15:15:09 [INFO    ] scan_0: Scanning example.com ():443
+2026-07-08 15:15:09 [INFO    ] scan_1: Scanning mysql-rfam-public.ebi.ac.uk ():4497
+2026-07-08 15:15:09 [INFO    ] scan_2: Scanning hh-pgsql-public.ebi.ac.uk ():5432
+2026-07-08 15:15:09 [INFO    ] scan_3: Scanning google.com ():80
+2026-07-08 15:15:09 [DEBUG   ] scan_1: DNS resolved mysql-rfam-public.ebi.ac.uk -> 193.62.194.221
+2026-07-08 15:15:09 [DEBUG   ] scan_2: DNS resolved hh-pgsql-public.ebi.ac.uk -> 193.62.192.243
+2026-07-08 15:15:09 [DEBUG   ] scan_0: DNS resolved example.com -> 104.20.23.154
+2026-07-08 15:15:09 [DEBUG   ] scan_3: DNS resolved google.com -> 142.251.41.14
+2026-07-08 15:15:09 [INFO    ] scan_0: Service probe 104.20.23.154:443 -> tls (tls=True, mode=implicit)
+2026-07-08 15:15:10 [INFO    ] scan_2: Service probe 193.62.192.243:5432 -> postgresql (tls=False, mode=none)
+2026-07-08 15:15:11 [INFO    ] scan_1: Service probe 193.62.194.221:4497 -> mysql 8.0.32-24 (tls=True, mode=negotiated)
+2026-07-08 15:15:12 [DEBUG   ] scan_3: TLS handshake failed 142.251.41.14:80 ([SSL] record layer failure (_ssl.c:1000))
+2026-07-08 15:15:12 [INFO    ] MainThread: CSV report written: C:\NetworkPortAndCertCheck\db_test.csv
+2026-07-08 15:15:12 [INFO    ] MainThread: HTML report written: C:\NetworkPortAndCertCheck\db_test.html
+2026-07-08 15:15:12 [INFO    ] MainThread: oracle-inator-cli finished
+2026-07-08 15:15:48 [INFO    ] MainThread: Scanning mysql-rfam-public.ebi.ac.uk ():4497
+2026-07-08 15:15:48 [DEBUG   ] MainThread: DNS resolved mysql-rfam-public.ebi.ac.uk -> 193.62.194.221
+2026-07-08 15:15:50 [INFO    ] MainThread: Service probe 193.62.194.221:4497 -> mysql 8.0.32-24 (tls=True, mode=negotiated)

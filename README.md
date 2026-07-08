@@ -25,6 +25,49 @@ to a CSV file and a polished HTML report.
 - **Full exception stack traces** captured per target and included in reports.
 - **CSV export** with all certificate details and errors.
 - Professional **HTML report**: `scan_ddmmyy_hhmm.html`.
+- **Database-aware scanning** (`dbprobe.py`): every open port is fingerprinted
+  and TLS is negotiated using each database's own protocol, so servers on
+  non-standard ports are handled correctly.
+
+## Command-line version
+
+`oracle-inator-cli.py` is a headless, tkinter-free counterpart with the same
+scan engine. Example:
+
+```bash
+python oracle-inator-cli.py -f sample_targets.csv -p 443,1433,3306,5432,1521,2484 -w 50
+```
+
+Run `python oracle-inator-cli.py --help` for all options.
+
+## Database scanning (MySQL, MSSQL, Oracle, PostgreSQL)
+
+Both scripts share `dbprobe.py`, which identifies the service on each open port
+and detects/negotiates SSL/TLS the way each database actually does it — this is
+important because databases (unlike HTTPS) generally do **not** use immediate
+"implicit" TLS. Results include the detected `service`, `service_version`, and
+`tls_mode` columns.
+
+| Database        | Detection & version                     | TLS handling                                            |
+| --------------- | --------------------------------------- | ------------------------------------------------------- |
+| PostgreSQL      | `SSLRequest` reply (`S`/`N`)            | Negotiated; cert extracted when TLS is offered          |
+| MySQL / MariaDB | Server greeting + version string        | `CLIENT_SSL` capability, upgrade + cert extraction      |
+| MSSQL (TDS)     | `PRELOGIN` response + version           | `ENCRYPTION` option; TLS handshake over TDS + cert      |
+| Oracle          | TNS listener reply / TCPS over TLS      | TCPS (implicit TLS) cert extracted; TNS 1521 is plaintext |
+
+Because probing is driven by the wire protocol rather than the port number,
+databases on non-standard ports are detected correctly. Point the scanner at a
+port range (e.g. `-p 1000-2000`) to discover which database, if any, answers on
+each port and whether it offers TLS.
+
+Notes / limitations:
+
+- Oracle **Native Network Encryption** on the TNS port (1521) is negotiated
+  inside TNS and is not TLS, so it is reported as "no TLS" (correctly — the tool
+  only detects SSL/TLS). Oracle TLS lives on the TCPS port (typically 2484).
+- MSSQL certificate extraction performs the TLS handshake encapsulated in TDS
+  packets; if a server requires client certificates the handshake may fail and
+  the result is detection-only.
 
 ## Requirements
 
