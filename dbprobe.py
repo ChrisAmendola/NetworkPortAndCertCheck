@@ -2,7 +2,7 @@
 """dbprobe.py
 
 Database-aware service fingerprinting and TLS negotiation, shared by
-oracle-inator.py (GUI) and oracle-inator-cli.py (CLI).
+sql_portcheck_tool.py (GUI) and sql_portcheck_tool_cli.py (CLI).
 
 Databases rarely expose "implicit" TLS the way HTTPS does. Each speaks its own
 wire protocol and upgrades to TLS through a protocol-specific handshake:

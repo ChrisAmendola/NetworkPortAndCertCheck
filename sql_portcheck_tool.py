@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""oracle-inator.py
+"""sql_portcheck_tool.py
 
 A GUI-driven network port + TLS certificate scanner.
 
@@ -56,7 +56,7 @@ except Exception:  # pragma: no cover - optional dependency
 # Logging
 # --------------------------------------------------------------------------- #
 LOG_FILE = "scanner.log"
-logger = logging.getLogger("oracle-inator")
+logger = logging.getLogger("sql_portcheck_tool")
 
 
 def setup_logging() -> None:
@@ -240,7 +240,7 @@ def negotiate_starttls(sock: socket.socket, proto: str, hostname: str) -> bool:
     try:
         if proto == "smtp":
             _recv_line(sock)  # banner
-            sock.sendall(b"EHLO oracle-inator.local\r\n")
+            sock.sendall(b"EHLO sql-portcheck.local\r\n")
             resp = _recv_line(sock)
             if "STARTTLS" not in resp.upper():
                 logger.debug("SMTP server did not advertise STARTTLS: %s", resp[:120])
@@ -276,7 +276,7 @@ def probe_starttls_advertised(ip: str, port: int, proto: str, hostname: str) -> 
             proto = proto.lower()
             if proto == "smtp":
                 _recv_line(sock)
-                sock.sendall(b"EHLO oracle-inator.local\r\n")
+                sock.sendall(b"EHLO sql-portcheck.local\r\n")
                 return "STARTTLS" in _recv_line(sock).upper()
             if proto == "imap":
                 banner = _recv_line(sock)
@@ -631,7 +631,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Oracle-inator Scan Report</title>
+<title>SQL Port Check Tool Scan Report</title>
 <style>
   :root {{
     --bg:#0f172a; --card:#1e293b; --ink:#e2e8f0; --muted:#94a3b8;
@@ -672,7 +672,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
 </head>
 <body>
   <header>
-    <h1>Oracle-inator &mdash; Network &amp; TLS Scan Report</h1>
+    <h1>SQL Port Check Tool &mdash; Network &amp; TLS Scan Report</h1>
     <p>Generated {escape(generated)} &nbsp;&bull;&nbsp; Source: {escape(source)}</p>
   </header>
   <div class="wrap">
@@ -694,7 +694,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
       <tbody>{''.join(rows)}</tbody>
     </table>
   </div>
-  <footer>Report produced by oracle-inator.py</footer>
+  <footer>Report produced by sql_portcheck_tool.py</footer>
 </body>
 </html>"""
 
@@ -720,10 +720,10 @@ class TextLogHandler(logging.Handler):
             pass
 
 
-class OracleInatorApp:
+class SqlPortCheckApp:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title("Oracle-inator :: Network Port & Certificate Scanner")
+        self.root.title("SQL Port Check Tool :: Network Port & Certificate Scanner")
         self.root.geometry("1180x720")
 
         self.targets: list[dict] = []
@@ -1150,13 +1150,13 @@ class OracleInatorApp:
 
 def main() -> None:
     setup_logging()
-    logger.info("oracle-inator starting up")
+    logger.info("sql_portcheck_tool starting up")
     if not HAVE_CRYPTOGRAPHY:
         logger.warning("cryptography not installed; certificate details limited")
     root = tk.Tk()
-    OracleInatorApp(root)
+    SqlPortCheckApp(root)
     root.mainloop()
-    logger.info("oracle-inator shutting down")
+    logger.info("sql_portcheck_tool shutting down")
 
 
 if __name__ == "__main__":

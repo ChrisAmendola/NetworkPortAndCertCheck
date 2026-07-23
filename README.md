@@ -1,8 +1,8 @@
-# Oracle-inator
+# SQL Port Check Tool
 
 A GUI-driven network port and TLS certificate scanner.
 
-`oracle-inator.py` presents a Tkinter interface that lets you load a list of
+`sql_portcheck_tool.py` presents a Tkinter interface that lets you load a list of
 targets (or add them by hand), scan them concurrently for open ports, detect
 TLS / STARTTLS services, extract certificate details, and export the findings
 to a CSV file and a polished HTML report.
@@ -31,14 +31,14 @@ to a CSV file and a polished HTML report.
 
 ## Command-line version
 
-`oracle-inator-cli.py` is a headless, tkinter-free counterpart with the same
+`sql_portcheck_tool_cli.py` is a headless, tkinter-free counterpart with the same
 scan engine. Example:
 
 ```bash
-python oracle-inator-cli.py -f sample_targets.csv -p 443,1433,3306,5432,1521,2484 -w 50
+python sql_portcheck_tool_cli.py -f sample_targets.csv -p 443,1433,3306,5432,1521,2484 -w 50
 ```
 
-Run `python oracle-inator-cli.py --help` for all options.
+Run `python sql_portcheck_tool_cli.py --help` for all options.
 
 ## Database scanning (MySQL, MSSQL, Oracle, PostgreSQL)
 
@@ -84,7 +84,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python oracle-inator.py
+python sql_portcheck_tool.py
 ```
 
 1. Click **Load CSV** and pick a file, or use **Add Target** to enter targets

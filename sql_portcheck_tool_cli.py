@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""oracle-inator-cli.py
+"""sql_portcheck_tool_cli.py
 
 Command-line network port + TLS certificate scanner (no GUI / no tkinter).
 
-A headless counterpart to oracle-inator.py. Feed it targets from one or more
+A headless counterpart to sql_portcheck_tool.py. Feed it targets from one or more
 CSV files and/or the command line, scan them concurrently, and export the
 findings to a CSV file and a professional HTML report.
 
@@ -23,9 +23,9 @@ Features:
   * CSV export with certificate details and errors + HTML report.
 
 Examples:
-  python oracle-inator-cli.py -f sample_targets.csv
-  python oracle-inator-cli.py -t example.com -t 192.0.2.10,,8443 -p 443,8443
-  python oracle-inator-cli.py -f hosts.csv -p 80,443,8000-8010 -w 50 -v
+  python sql_portcheck_tool_cli.py -f sample_targets.csv
+  python sql_portcheck_tool_cli.py -t example.com -t 192.0.2.10,,8443 -p 443,8443
+  python sql_portcheck_tool_cli.py -f hosts.csv -p 80,443,8000-8010 -w 50 -v
 
 Requires: cryptography  (pip install cryptography)
 """
@@ -61,7 +61,7 @@ except Exception:  # pragma: no cover - optional dependency
 # Logging
 # --------------------------------------------------------------------------- #
 LOG_FILE = "scanner.log"
-logger = logging.getLogger("oracle-inator")
+logger = logging.getLogger("sql_portcheck_tool")
 
 
 def setup_logging(log_file: str = LOG_FILE, console_level: int = logging.WARNING) -> None:
@@ -244,7 +244,7 @@ def negotiate_starttls(sock: socket.socket, proto: str, hostname: str) -> bool:
     try:
         if proto == "smtp":
             _recv_line(sock)  # banner
-            sock.sendall(b"EHLO oracle-inator.local\r\n")
+            sock.sendall(b"EHLO sql-portcheck.local\r\n")
             resp = _recv_line(sock)
             if "STARTTLS" not in resp.upper():
                 logger.debug("SMTP server did not advertise STARTTLS: %s", resp[:120])
@@ -280,7 +280,7 @@ def probe_starttls_advertised(ip: str, port: int, proto: str, hostname: str) -> 
             proto = proto.lower()
             if proto == "smtp":
                 _recv_line(sock)
-                sock.sendall(b"EHLO oracle-inator.local\r\n")
+                sock.sendall(b"EHLO sql-portcheck.local\r\n")
                 return "STARTTLS" in _recv_line(sock).upper()
             if proto == "imap":
                 banner = _recv_line(sock)
@@ -635,7 +635,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Oracle-inator Scan Report</title>
+<title>SQL Port Check Tool Scan Report</title>
 <style>
   :root {{
     --bg:#0f172a; --card:#1e293b; --ink:#e2e8f0; --muted:#94a3b8;
@@ -676,7 +676,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
 </head>
 <body>
   <header>
-    <h1>Oracle-inator &mdash; Network &amp; TLS Scan Report</h1>
+    <h1>SQL Port Check Tool &mdash; Network &amp; TLS Scan Report</h1>
     <p>Generated {escape(generated)} &nbsp;&bull;&nbsp; Source: {escape(source)}</p>
   </header>
   <div class="wrap">
@@ -698,7 +698,7 @@ def write_html(results: list[ScanResult], path: str, source: str) -> None:
       <tbody>{''.join(rows)}</tbody>
     </table>
   </div>
-  <footer>Report produced by oracle-inator-cli.py</footer>
+  <footer>Report produced by sql_portcheck_tool_cli.py</footer>
 </body>
 </html>"""
 
@@ -809,14 +809,14 @@ def build_jobs(targets: list[dict], port_list: list[int]) -> list[dict]:
 # --------------------------------------------------------------------------- #
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="oracle-inator-cli.py",
+        prog="sql_portcheck_tool_cli.py",
         description="Headless network port + TLS certificate scanner.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
-            "  python oracle-inator-cli.py -f sample_targets.csv\n"
-            "  python oracle-inator-cli.py -t example.com:443 -t host,10.0.0.5,8443\n"
-            "  python oracle-inator-cli.py -f hosts.csv -p 80,443,8000-8010 -w 50 -v\n"
+            "  python sql_portcheck_tool_cli.py -f sample_targets.csv\n"
+            "  python sql_portcheck_tool_cli.py -t example.com:443 -t host,10.0.0.5,8443\n"
+            "  python sql_portcheck_tool_cli.py -f hosts.csv -p 80,443,8000-8010 -w 50 -v\n"
         ),
     )
     parser.add_argument("-f", "--csv", action="append", default=[], metavar="PATH",
@@ -929,7 +929,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     DEFAULT_TIMEOUT = args.timeout
 
-    logger.info("oracle-inator-cli starting up")
+    logger.info("sql_portcheck_tool_cli starting up")
     if not HAVE_CRYPTOGRAPHY:
         logger.warning("cryptography not installed; certificate details limited")
 
@@ -1014,7 +1014,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         for path in written:
             print(f"  {path}")
 
-    logger.info("oracle-inator-cli finished")
+    logger.info("sql_portcheck_tool_cli finished")
     # Non-zero exit if every job errored out.
     return 0 if any(not r.error for r in results) or not results else 1
 
